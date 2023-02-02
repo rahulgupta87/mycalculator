@@ -4,6 +4,11 @@ import pymongo
 from flask import Flask, request
 app = Flask(__name__)
 
+@app.route("/healthCheck", methods=["GET"])
+def healthCheck():
+    print('performing health check...')
+    return "ok"
+
 #### exposing flask api with path /calculate and method type POST
 @app.route("/calculate", methods=["POST"])
 def calculate():
@@ -25,21 +30,23 @@ def calculate():
     load_dotenv()
     mongoUser = os.getenv("MONGOUSER")
     mongoPwd = os.getenv("MONGOPWD")
-    mongoDb = 'dev'
+    mongoDb = 'test'
     mongoCollection = 'calculator-records'
     
     ## mongodb client to establish connection with the db cluster
-    mongoClient = pymongo.MongoClient("mongodb+srv://"+mongoUser+":"+mongoPwd+"@cluster-dev.qhs7f.mongodb.net/?retryWrites=true&w=majority")
+    mongoClient = pymongo.MongoClient("mongodb+srv://"+mongoUser+":"+mongoPwd+"@cluster-dev.a8h29.mongodb.net/?retryWrites=true&w=majority")
     db = mongoClient[mongoDb]
     collection = db[mongoCollection]
 
     image = {}
-    image['operator'] = operator
     image['operand1'] = operand1
+    image['operator'] = operator
     image['operand2'] = operand2
     image['result'] = result
     
     collection.insert_one(image)
+    
+    mongoClient.close()
     print('Data successfully inserted in mongo...')
 
     return {"result": result}
