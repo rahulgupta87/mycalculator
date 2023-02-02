@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calculator
+  labels:
+    app: calculator-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: calculator-app
+  template:
+    metadata:
+      labels:
+        app: calculator-app
+    spec:
+      containers:
+        - name: calculator-app-container
+          image: rgupta87/mycalculator:latest
+          ports:
+            - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: calculator-app-svc
+spec:
+  type: NodePort
+  selector:
+    app: calculator-app
+  ports:
+    - name: calculator-app-port
+      protocol: TCP
+      port: 5000
+      targetPort: 5000
+      nodePort: 32167
